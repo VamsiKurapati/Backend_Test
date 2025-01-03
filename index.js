@@ -27,7 +27,9 @@ async function startServer() {
     app.use(cookieParser());
     app.use(cors({
       origin: "http://localhost:5173",
-      credentials: true
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add other methods as needed
+      allowedHeaders: ['Content-Type', 'Authorization'], // Add other headers if required
     }));
 
     app.use('/api/user', userroute);
