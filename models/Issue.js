@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const issueSchema = new mongoose.Schema(
     {
-        // subject,description,type,priority,LockerNumber
+        // subject,description,type,status,LockerNumber,Email
         subject: {
             type: String,
             required: true,
@@ -15,18 +15,23 @@ const issueSchema = new mongoose.Schema(
             type: String,
             enum: ['technical', 'locker'],
         },
-        priority: {
-            type: String,
-            enum: ['low', 'medium', 'high']
-        },
         status: {
             type: String,
+            // enum: ['resolved', 'inAction', 'notResolved'],
             default: 'Unresolved'
         },
         LockerNumber: {
             type: Number,
         },
-
+        email: {
+            type: String,
+            required: true,
+        },
+        comment : {
+            type: String,
+            default: "",
+        }
+        
     },
     { timestamps: true }
 );

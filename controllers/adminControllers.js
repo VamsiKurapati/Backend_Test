@@ -5,6 +5,8 @@ require('dotenv').config();
 const { errorHandler } = require('../utils/error.js');
 const jwt = require('jsonwebtoken');
 const mailSender=require('../utils/mailSender')
+
+
 exports.addStaff = async (req, res, next) => {
     try {
         // if(req.user.role!=='Admin'){
@@ -33,12 +35,59 @@ exports.addStaff = async (req, res, next) => {
             expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
             httpOnly: true,
         };
+
+        const htmlBody = `
+            <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; line-height: 1.6;">
+      
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img 
+                    src="${process.env.IMG_LINK}" 
+                    alt="Company Logo" 
+                    style="width: 500px; height: auto;" 
+                    />
+                </div>
+
+                
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    Dear ${name},
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    We are excited to inform you that you have been successfully added to our Lockerwise. This system allows you to manage your locker assignments efficiently and securely. 
+                </p>
+
+                
+                <p style="font-size: 16px; color: #333; font-weight: bold; margin: 0 0 10px 0;">
+                    Here are your account details:
+                </p>
+                <ul style="font-size: 16px; padding-left: 20px; margin: 0 0 15px 0; color: #333;">
+                    <li><strong>Email:</strong> ${email}</li>
+                    <li><strong>Temporary Password:</strong> ${password}</li>
+                    <li><strong>Portal Link:</strong><a href="http://localhost:5173/login">http://localhost:5173/login</a></li>
+                </ul>
+
+                
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    Please log in using the above credentials and change your password upon first login to ensure account security. 
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    If you have any questions or need assistance accessing your account, please don’t hesitate to contact us at <strong>[Support Email/Phone]<strong/>. 
+                </p>
+
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    We’re thrilled to have you onboard! 
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0;">
+                    Best regards,<br />
+                    <strong>DraconX Pvt. Ltd</strong>,<br/>  
+                    <strong>"From Vision to Validation, faster"</strong>
+                </p>
+            </div>
+        `;
+
         await mailSender(
             email,
-            "Your credentials for login from Draconx are :  ",
-            `email : ${email}
-            password : ${password}
-            `
+            "Welcome! You've Been Added to the Lockerwise",
+            htmlBody
         );
 
         res.cookie("token", token, options).status(200).json(rest);

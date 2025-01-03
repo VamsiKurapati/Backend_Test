@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-const mailSender = async (email, title, body, attachments = []) => {
+const mailSender = async (email, title, htmlBody) => {
     try {
         let transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
@@ -17,8 +17,8 @@ const mailSender = async (email, title, body, attachments = []) => {
             from: "7400563257gourav@gmail.com",
             to: email,
             subject: title,
-            html: body,
-            attachments,
+            html: htmlBody,
+            
         });
 
         console.log("Message sent: %s", info.messageId);

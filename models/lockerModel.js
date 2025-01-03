@@ -77,7 +77,11 @@ const lockerSchema = new mongoose.Schema(
         },
         expiresOn: {
             type: Date
-        }
+        },
+        emailSent: { // New field to track email notification status
+            type: Boolean,
+            default: false,
+        },
     },
     { timestamps: true }
 );

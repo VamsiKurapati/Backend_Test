@@ -3,6 +3,7 @@ const OTP = require("../models/OTP.js");
 const Locker = require("../models/lockerModel.js");
 const mailSender = require("../utils/mailSender.js");
 const fs = require("fs");
+require('dotenv').config();
 
 exports.getAvailableLocker = async (req, res, next) => {
     try {
@@ -33,11 +34,13 @@ exports.getAvailableLocker = async (req, res, next) => {
     }
 };
 
-function convertToIST(date) {
-    // Adjust the date for IST (UTC + 5:30)
-    const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
-    return new Date(date.getTime() + istOffset);
-}
+function formatdate(date){
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${day}/${month}/${year}`;
+};
 
 exports.allocateLocker = async (req, res, next) => {
     try {
@@ -61,21 +64,25 @@ exports.allocateLocker = async (req, res, next) => {
             // Set expiresOn to 3 months from the current date
             const threeMonthsFromNow = new Date();
             threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
-            expiresOn = convertToIST(threeMonthsFromNow); // Convert to IST
+            threeMonthsFromNow.setHours(23, 59, 59, 999); // Set time to 11:59 PM
+            expiresOn = threeMonthsFromNow.toISOString();
         } else if (duration === "6") {
             // Set expiresOn to 6 months from the current date
             const sixMonthsFromNow = new Date();
             sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
-            expiresOn = convertToIST(sixMonthsFromNow); // Convert to IST
+            sixMonthsFromNow.setHours(23, 59, 59, 999); // Set time to 11:59 PM
+            expiresOn = sixMonthsFromNow.toISOString();
         } else if (duration === "12") {
             // Set expiresOn to 12 months from the current date
             const twelveMonthsFromNow = new Date();
             twelveMonthsFromNow.setMonth(twelveMonthsFromNow.getMonth() + 12);
-            expiresOn = convertToIST(twelveMonthsFromNow); // Convert to IST
+            twelveMonthsFromNow.setHours(23, 59, 59, 999); // Set time to 11:59 PM
+            expiresOn = twelveMonthsFromNow.toISOString();
         } else if (endDate) {
             // Set expiresOn to provided endDate
-            expiresOn = new Date(endDate);
-            expiresOn = convertToIST(expiresOn); // Convert to IST
+            const expires = new Date(endDate);
+            expires.setHours(23, 59, 59, 999); // Set time to 11:59 PM
+            expiresOn = expires.toISOString();
         }
 
         // LockerType,LockerStatus,LockerNumber,LockerCode,
@@ -102,121 +109,49 @@ exports.allocateLocker = async (req, res, next) => {
       
                 <div style="text-align: center; margin-bottom: 20px;">
                     <img 
-                    src="cid:companyLogo" 
+                    src="${process.env.IMG_LINK}" 
                     alt="Company Logo" 
-                    style="width: 200px; height: auto;" 
+                    style="width: 500px; height: auto;" 
                     />
                 </div>
 
                 
-                <p style="font-size: 16px; margin: 0 0 15px 0;">
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
                     Dear ${employeeName},
                 </p>
-                <p style="font-size: 16px; margin: 0 0 15px 0;">
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
                     We are pleased to inform you that a locker has been assigned to you as per your request. Please find the details below:
                 </p>
 
                 
-                <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px 0;">
+                <p style="font-size: 16px; color: #333; font-weight: bold; margin: 0 0 10px 0;">
                     Locker Assignment Details:
                 </p>
-                <ul style="font-size: 16px; padding-left: 20px; margin: 0 0 15px 0;">
+                <ul style="font-size: 16px; padding-left: 20px; margin: 0 0 15px 0; color: #333;">
                     <li><strong>Locker Number:</strong> ${lockerNumber}</li>
-                    <li><strong>Duration:</strong> ${duration === "customize" ? `${startDate} to ${endDate}` : `${duration} Months`}</li>
+                    <li><strong>Locker Code:</strong> ${lockerCode}</li>
+                    <li><strong>Duration:</strong> ${duration === "customize" ? `${formatdate(startDate)} to ${formatdate(endDate)}` : `${duration} Months`}</li>
                 </ul>
 
                 
-                <p style="font-size: 16px; margin: 0 0 15px 0;">
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
                     Kindly ensure to use the locker responsibly and report any issues or concerns to the administration team.
                 </p>
-                <p style="font-size: 16px; margin: 0 0 15px 0;">
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
                     If you have any questions or require further assistance, please do not hesitate to contact us at <strong>[Support Email/Phone]</strong>.
                 </p>
-
-                
-                <p style="font-size: 16px; margin: 0;">
+                <p style="font-size: 16px; color: #333; margin: 0;">
                     Best regards,<br />
-                    <strong>DraconX Pvt. Ltd</strong><br />
-                    "From Vision to Validation, faster"
+                    <strong>DraconX Pvt. Ltd</strong>,<br/>
+                    <strong>"From Vision to Validation, faster"</strong>  
                 </p>
             </div>
         `;
-
-        const companyLogoBase64 = fs.readFileSync("./companyLogo.png", { encoding: "base64" });
-
-        const attachments = [
-            {
-                filename: "companyLogo.png",
-                content: companyLogoBase64,
-                encoding: "base64",
-                cid: "companyLogo",
-            },
-        ];
-        await mailSender(email, "Your Locker Assignment Details ", htmlBody, attachments);
+        
+        await mailSender(email, "Your Locker Assignment Details ", htmlBody);
 
         return res.status(200).json({
             message: "Locker allocated successfully",
-            data: locker,
-        });
-    } catch (err) {
-        console.log(`Error in allocating locker: ${err.message}`);
-        next(err);
-    }
-};
-
-exports.renewLocker = async (req, res, next) => {
-    try {
-        const { lockerNumber, costToEmployee, duration, startDate, endDate, EmployeeEmail } = req.body;
-        // console.log( lockerNumber,lockerType, lockerCode, employeeName, employeeId, employeeEmail, employeePhone, employeeGender, costToEmployee, duration, startDate, endDate )
-
-        if (!lockerNumber || !EmployeeEmail) {
-            return res.status(400).json({ message: "lockerNumber is required" });
-        }
-
-        const email = EmployeeEmail;
-        const locker = await Locker.findOne({
-            LockerNumber: lockerNumber,
-        });
-
-        if (!locker) {
-            return res.status(404).json({ message: "Locker is not available or does not exist" });
-        }
-
-        let expiresOn;
-        if (duration === "3") {
-            // Set expiresOn to 3 months from the current date
-            const threeMonthsFromNow = new Date();
-            threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
-            expiresOn = convertToIST(threeMonthsFromNow); // Convert to IST
-        } else if (duration === "6") {
-            // Set expiresOn to 6 months from the current date
-            const sixMonthsFromNow = new Date();
-            sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
-            expiresOn = convertToIST(sixMonthsFromNow); // Convert to IST
-        } else if (duration === "12") {
-            // Set expiresOn to 12 months from the current date
-            const twelveMonthsFromNow = new Date();
-            twelveMonthsFromNow.setMonth(twelveMonthsFromNow.getMonth() + 12);
-            expiresOn = convertToIST(twelveMonthsFromNow); // Convert to IST
-        } else if (endDate) {
-            // Set expiresOn to provided endDate
-            expiresOn = new Date(endDate);
-            expiresOn = convertToIST(expiresOn); // Convert to IST
-        }
-        locker.CostToEmployee = costToEmployee;
-        locker.Duration = duration;
-        locker.StartDate = startDate;
-        locker.EndDate = endDate;
-        locker.LockerStatus = "occupied";
-
-        locker.expiresOn = expiresOn;
-        // employeeName,employeeId,employeeEmail,employeePhone,employeeGender,CostToEmployee,Duration,StartDate,EndDate
-
-        await locker.save();
-
-        await mailSender(email, "Locker Renewal", `Congratulations your  locker with locker number  ${lockerNumber} has been successfully renewed`);
-        return res.status(200).json({
-            message: "Locker Renewed successfully",
             data: locker,
         });
     } catch (err) {
@@ -229,7 +164,7 @@ exports.cancelLockerAllocation = async (req, res, next) => {
     try {
         const { lockerNumber, EmployeeEmail } = req.body;
         // console.log( lockerNumber,lockerType, lockerCode, employeeName, employeeId, employeeEmail, employeePhone, employeeGender, costToEmployee, duration, startDate, endDate )
-        console.log(lockerNumber, EmployeeEmail);
+        // console.log(lockerNumber, EmployeeEmail);
         if (!lockerNumber || !EmployeeEmail) {
             return res.status(400).json({ message: "lockerNumber is required" });
         }
@@ -239,10 +174,70 @@ exports.cancelLockerAllocation = async (req, res, next) => {
             LockerNumber: lockerNumber,
         });
 
+        //console.log(duration)
+
         if (!locker) {
             return res.status(404).json({ message: "Locker is not available or does not exist" });
         }
         // ********************************************************************************************************************************
+
+        if(locker.employeeEmail !== EmployeeEmail){
+            return res.status(400).json({message: "Enter correct details"});
+        }
+        const duration = locker.Duration
+        const name = locker.employeeName
+
+        const currentDate = new Date();
+        const formatted = currentDate.toLocaleDateString()
+
+        const htmlBody = `
+            <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; line-height: 1.6;">
+      
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img 
+                    src="${process.env.IMG_LINK}" 
+                    alt="Company Logo" 
+                    style="width: 500px; height: auto;" 
+                    />
+                </div>
+
+                
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    Dear ${name},
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    We regret to inform you that your locker assignment has been cancelled. Below are the details of the cancelled locker:
+                </p>
+
+                
+                <p style="font-size: 16px; color: #333; font-weight: bold; margin: 0 0 10px 0;">
+                    Locker Details:
+                </p>
+                <ul style="font-size: 16px; padding-left: 20px; margin: 0 0 15px 0; color: #333;">
+                    <li><strong>Locker Number:</strong> ${lockerNumber}</li>
+                    <li><strong>Cancellation Date:</strong> ${formatted}</li>
+                    <li><strong>Original Validity Period:</strong> ${duration === "customize" ? `${formatdate(locker.StartDate)} to ${formatdate(locker.EndDate)}` : `${duration} Months`}</li>
+                </ul>
+
+                
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    If this cancellation was not requested by you or if you have any concerns, please contact us immediately at <strong>[Support Email/Phone]</strong>.
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    We apologize for any inconvenience this may cause and are happy to assist with reassigning a locker if needed.
+                </p>
+
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    Thank you for your understanding.
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0;">
+                    Best regards,<br />
+                    <strong>DraconX Pvt. Ltd</strong>,<br/>  
+                    <strong>"From Vision to Validation, faster"</strong>
+                </p>
+            </div>
+        `;
+        await mailSender(email, "Notification of Locker Cancellation", htmlBody);
 
         let oldCode = locker.LockerCode;
         oldCode = oldCode.substring(1) + oldCode[0];
@@ -260,12 +255,126 @@ exports.cancelLockerAllocation = async (req, res, next) => {
         locker.EndDate = "";
         locker.LockerStatus = "available";
         locker.expiresOn = "";
+        locker.emailSent = false;
 
         await locker.save();
-        await mailSender(email, "Locker Taken Back", `Alert your locker with locker number  ${lockerNumber} is taken back `);
 
         return res.status(200).json({
             message: "Locker taken back successfully",
+            data: locker,
+        });
+    } catch (err) {
+        console.log(`Error in canceling locker: ${err.message}`);
+        next(err);
+    }
+};
+
+exports.renewLocker = async (req, res, next) => {
+    try {
+        const { lockerNumber, costToEmployee, duration, startDate, endDate, EmployeeEmail } = req.body;
+        // console.log( lockerNumber,lockerType, lockerCode, employeeName, employeeId, employeeEmail, employeePhone, employeeGender, costToEmployee, duration, startDate, endDate )
+
+        if (!lockerNumber || !EmployeeEmail) {
+            return res.status(400).json({ message: "lockerNumber is required" });
+        }
+
+        const email = EmployeeEmail;
+        const locker = await Locker.findOne({
+            LockerNumber: lockerNumber,
+        });
+        const employeeName = locker.employeeName
+
+        if (!locker) {
+            return res.status(404).json({ message: "Locker is not available or does not exist" });
+        }
+
+        let expiresOn;
+        if (duration === "3") {
+            // Set expiresOn to 3 months from the current date
+            const threeMonthsFromNow = new Date();
+            threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+            threeMonthsFromNow.setHours(23,59,59,999);
+            expiresOn = threeMonthsFromNow.toISOString(); 
+        } else if (duration === "6") {
+            // Set expiresOn to 6 months from the current date
+            const sixMonthsFromNow = new Date();
+            sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
+            sixMonthsFromNow.setHours(23,59,59,999);
+            expiresOn = sixMonthsFromNow.toISOString(); 
+        } else if (duration === "12") {
+            // Set expiresOn to 12 months from the current date
+            const twelveMonthsFromNow = new Date();
+            twelveMonthsFromNow.setMonth(twelveMonthsFromNow.getMonth() + 12);
+            twelveMonthsFromNow.setHours(23,59,59,999);
+            expiresOn = twelveMonthsFromNow.toISOString(); 
+        } else if (endDate) {
+            // Set expiresOn to provided endDate
+            const expires = new Date(endDate);
+            expires.setHours(23,59,59,999);
+            expiresOn = expires.toISOString();
+        }
+
+        locker.CostToEmployee = costToEmployee;
+        locker.Duration = duration;
+        locker.StartDate = startDate;
+        locker.EndDate = endDate;
+        locker.LockerStatus = "occupied";
+        locker.emailSent = "false";
+        locker.expiresOn = expiresOn;
+        // employeeName,employeeId,employeeEmail,employeePhone,employeeGender,CostToEmployee,Duration,StartDate,EndDate
+
+        await locker.save();
+
+        const currentDate = new Date()
+        const formattedDate = currentDate.toLocaleDateString();
+
+        const htmlBody = `
+            <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; line-height: 1.6;">
+      
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img 
+                    src="${process.env.IMG_LINK}" 
+                    alt="Company Logo" 
+                    style="width: 500px; height: auto;" 
+                    />
+                </div>
+
+                
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    Dear ${employeeName},
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                   We are pleased to inform you that your locker renewal has been successfully processed. Below are the updated details of your locker:
+                </p>
+
+                
+                <p style="font-size: 16px; color: #333; font-weight: bold; margin: 0 0 10px 0;">
+                    Locker Details:
+                </p>
+                <ul style="font-size: 16px; padding-left: 20px; margin: 0 0 15px 0; color: #333;">
+                    <li><strong>Locker Number:</strong> ${lockerNumber}</li>
+                    <li><strong>Renewal Date:</strong> ${formattedDate}</li>
+                    <li><strong>New Validity Period:</strong> ${duration === "customize" ? `${formatdate(startDate)} to ${formatdate(endDate)}` : `${duration} Months`}</li>
+                </ul>
+
+                
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    Thank you for renewing your locker. We are committed to providing a seamless and secure locker management experience
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    If you have any questions or need further assistance, please feel free to contact us at <strong>[Support Email/Phone]</strong>.
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0;">
+                    Best regards,<br />
+                    <strong>DraconX Pvt. Ltd</strong>,<br/>
+                    <strong>"From Vision to Validation, faster"</strong>  
+                </p>
+            </div>
+        `;
+
+        await mailSender(email, "Your Locker Renewal Has Been Successfully Processsed", htmlBody);
+        return res.status(200).json({
+            message: "Locker Renewed successfully",
             data: locker,
         });
     } catch (err) {
@@ -286,6 +395,7 @@ exports.getAllLockers = async (req, res, next) => {
         next(err);
     }
 };
+
 exports.getAllocatedLockers = async (req, res, next) => {
     try {
         const data = await Locker.find({ LockerStatus: "occupied" });
@@ -298,6 +408,7 @@ exports.getAllocatedLockers = async (req, res, next) => {
         next(err);
     }
 };
+
 exports.getAvailableLockers = async (req, res, next) => {
     try {
         const data = await Locker.find({ LockerStatus: "available" });
@@ -324,43 +435,6 @@ exports.getExpiredLockers = async (req, res, next) => {
     }
 };
 
-// exports.getExpiringIn7daysLockers = async (req, res, next) => {
-//     try {
-//         const today = new Date();
-//         const sevenDaysFromNow = new Date(today);
-//         sevenDaysFromNow.setDate(today.getDate() + 7);
-
-//         const data = await Locker.find({
-//             expiresOn: { $lte: sevenDaysFromNow },
-//         });
-//         return res.status(200).json({
-//             message: "All expired Lockers",
-//             data
-//         });
-//     } catch (err) {
-//         console.log(`Error in allocating locker: ${err.message}`);
-//         next(err);
-//     }
-// }
-// exports.getExpiringToday = async (req, res, next) => {
-//     try {
-//         const today = new Date();
-//         const sevenDaysFromNow = new Date(today);
-//         sevenDaysFromNow.setDate(today.getDate());
-
-//         const data = await Locker.find({
-//             expiresOn: { $lte: sevenDaysFromNow },
-//         });
-//         return res.status(200).json({
-//             message: "All expired Lockers",
-//             data
-//         });
-//     } catch (err) {
-//         console.log(`Error in allocating locker: ${err.message}`);
-//         next(err);
-//     }
-// }
-
 exports.changeLockerPricing = async (req, res, next) => {
     try {
         const { id, LockerPrice3Month, LockerPrice6Month, LockerPrice12Month } = req.body;
@@ -378,16 +452,17 @@ exports.changeLockerPricing = async (req, res, next) => {
         return next(err);
     }
 };
+
 exports.getExpiringIn7daysLockers = async (req, res, next) => {
     try {
-        const todayIST = new Date();
-        todayIST.setHours(0, 0, 0, 0); // Start of IST day
+        const todayUTC = new Date();
+        todayUTC.setHours(0, 0, 0, 0); // Start of IST day
 
-        const sevenDaysFromNowIST = new Date(todayIST);
-        sevenDaysFromNowIST.setDate(todayIST.getDate() + 7); // 7 days from now
+        const sevenDaysFromNowUTC = new Date(todayUTC);
+        sevenDaysFromNowUTC.setDate(todayUTC.getUTCDate() + 7); // 7 days from now
 
         const data = await Locker.find({
-            expiresOn: { $gte: todayIST, $lte: sevenDaysFromNowIST },
+            expiresOn: { $gte: todayUTC, $lte: sevenDaysFromNowUTC },
         });
 
         return res.status(200).json({
@@ -402,29 +477,15 @@ exports.getExpiringIn7daysLockers = async (req, res, next) => {
 
 exports.getExpiringToday = async (req, res, next) => {
     try {
-        const todayIST = new Date();
-        todayIST.setHours(0, 0, 0, 0); // Start of IST day
+        const todayUTC = new Date();
+        todayUTC.setHours(0, 0, 0, 0); // Start of UTC day
 
-        const endOfTodayIST = new Date(todayIST);
-        endOfTodayIST.setHours(23, 59, 59, 999); // End of IST day
+        const endOfTodayUTC = new Date(todayUTC);
+        endOfTodayUTC.setHours(23, 59, 59, 999); // End of UTC day
 
         const data = await Locker.find({
-            expiresOn: { $gte: todayIST, $lte: endOfTodayIST },
+            expiresOn: { $gte: todayUTC, $lte: endOfTodayUTC },
         });
-
-        for (const locker of data) {
-            const email = locker.employeeEmail; // Assuming the field is `employeeEmail`
-            if (email) {
-                try {
-                    await mailSender(email, "Locker Expiration Notification", `Your locker with ID ${locker._id} is expiring today. Please take necessary action.`);
-                    console.log(`Email sent to ${email} for locker ${locker._id}`);
-                } catch (emailError) {
-                    console.error(`Error sending email to ${email}: ${emailError.message}`);
-                }
-            } else {
-                console.warn(`No email found for locker ${locker._id}`);
-            }
-        }
 
         return res.status(200).json({
             message: "Lockers expiring today",

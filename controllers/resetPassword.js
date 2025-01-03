@@ -2,6 +2,7 @@ const mailSender = require("../utils/mailSender.js");
 const OTP = require("../models/OTP.js");
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel.js");
+require('dotenv').config();
 function generateOTP() {
     const otp = Math.floor(100000 + Math.random() * 900000);
     return otp.toString();
@@ -24,7 +25,41 @@ exports.getOtp = async (req, res, next) => {
         const otp = generateOTP();
         console.log(otp);
         const newOTP = await OTP.create({ email, otp });
-        await mailSender(email, "Password Reset", `your otp from Dev-forge Software solutions for resetting password is ${otp}.`);
+
+        const htmlBody = `
+            <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; line-height: 1.6;">
+      
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img 
+                    src="${process.env.IMG_LINK}" 
+                    alt="Company Logo" 
+                    style="width: 500px; height: auto;" 
+                    />
+                </div>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    We received a request to reset your password for the Locker Management System.
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    Please use the One-Time Password (OTP) provided below to proceed with changing your password:
+                </p>
+                <p style="font-size: 16px; color: #333; font-weight: bold; margin: 0 0 10px 0;">
+                    <strong>Your OTP:</strong> ${otp}
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    If you did not request this password reset, please ignore this email or contact our support team immediately.
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                    If this cancellation was not requested by you or if you have any concerns, please contact us immediately at <strong>[Support Email/Phone]</strong>.
+                </p>
+                <p style="font-size: 16px; color: #333; margin: 0;">
+                    Best regards,<br />
+                    <strong>DraconX Pvt. Ltd</strong>,<br/>  
+                    <strong>"From Vision to Validation, faster"</strong>
+                </p>
+            </div>
+        `;
+
+        await mailSender(email, "Your OTP for Password Reset", htmlBody);
 
         return res.status(200).json({
             message: "OTP sent successfully",

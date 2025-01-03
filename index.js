@@ -3,7 +3,6 @@ const cookieParser = require('cookie-parser');
 const dbConnect = require('./utils/databaseConnect.js')
 const cors = require('cors');
 const userroute = require('./routes/authRoutes.js')
-//const Locker=require('./models/locker.js')
 const adminRoute = require('./routes/adminRoutes.js')
 const resetPasswordRoute = require('./routes/resetPasswordRoute.js')
 const lockerRoute = require('./routes/lockerRoutes.js')
@@ -20,97 +19,187 @@ const upload = multer({ storage: multer.memoryStorage() });
 const axios = require('axios'); // Import axios
 
 const verifyToken=require('./utils/verifyUser.js')
-dbConnect();
+async function startServer() {
+  try{
+    await dbConnect();
 
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
-}));
+    app.use(express.json());
+    app.use(cookieParser());
+    app.use(cors({
+      origin: "http://localhost:5173",
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add other methods as needed
+      allowedHeaders: ['Content-Type', 'Authorization'], // Add other headers if required
+    }));
 
-app.use('/api/user', userroute);
-app.use('/api/admin', adminRoute);
-app.use('/api/resetPassword', resetPasswordRoute);
-app.use('/api/locker', lockerRoute);
-app.use('/api/issue', issueRoute);
-app.use('/api/profile', profileRoute);
+    app.use('/api/user', userroute);
+    app.use('/api/admin', adminRoute);
+    app.use('/api/resetPassword', resetPasswordRoute);
+    app.use('/api/locker', lockerRoute);
+    app.use('/api/issue', issueRoute);
+    app.use('/api/profile', profileRoute);
 
-app.listen(process.env.PORT, () => {
-  console.log(`server is running on port ${process.env.PORT}`);
-})
+    app.listen(process.env.PORT, () => {
+      console.log(`server is running on port ${process.env.PORT}`);
+    });
+  } catch (error) {
+    console.error(`Error starting server: ${error.message}`);
+  }
+}
+
+startServer();
 
 app.get('/', (req, res) => {
   res.send('Welcome to the backend!');
 });
 
+function formatdate(date){
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${day}/${month}/${year}`;
+};
 
-cron.schedule('* * * * *', async () => {
-  try {
-    const nowInIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
-
-    const result = await Locker.updateMany(
-      { expiresOn: { $lte: nowInIST }, LockerStatus: { $ne: "expired" } },
-      { LockerStatus: "expired" }
-    );
-
-    console.log(result);
-  } catch (err) {
-    console.error(`Error updating expired lockers: ${err.message}`);
-  }
-});
-
-// cron.schedule('* * * * *', async () => {
-  cron.schedule('0 */6 * * *', async () => {
-  try {
-    const todayIST = new Date();
-    todayIST.setHours(0, 0, 0, 0); // Start of IST day
-
-    const endOfTodayIST = new Date(todayIST);
-    endOfTodayIST.setHours(23, 59, 59, 999); // End of IST day
-
-    const data = await Locker.find({
-        expiresOn: { $gte: todayIST, $lte: endOfTodayIST },
-    });
-    
-    for (const locker of data) {
-        const email = locker.employeeEmail; // Assuming the field is `employeeEmail`
-        if (email) {
-            try {
-                await mailSender(
-                    email,
-                    "Locker Expiration Notification",
-                    `Your locker with ID ${locker._id} is expiring today. Please take necessary action.`
-                );
-                console.log(`Email sent to ${email} for locker ${locker._id}`);
-            } catch (emailError) {
-                console.error(`Error sending email to ${email}: ${emailError.message}`);
-            }
-        } else {
-            console.warn(`No email found for locker ${locker._id}`);
-        }
-    }
-  } catch (err) {
-    console.error(`Error updating expired lockers: ${err.message}`);
-  }
-});
-
-
-// cron.schedule('* * * * *', async () => {   // will run every hour
+// cron.schedule('*/1 * * * *', async () => {
 //   try {
-     
+//     // Now the current UTC time
+//     const nowInUTC = new Date().toISOString() // Current time in UTC
+//     console.log('Now in UTC:', nowInUTC);
+
+//     // // Update lockers with expired status if they expire today in UTC
+//     // const result = await Locker.updateMany(
+//     //   { expiresOn: { $lte: nowInUTC }, LockerStatus: { $ne: "expired" } },
+//     //   { LockerStatus: "expired" }
+//     // );
+//     // console.log(result);
+
+//     const lockers = await Locker.find({ expiresOn: { $lte: nowInUTC } });
+//     lockers.forEach(locker => {
+//       console.log('Locker expiresOn (raw):', locker.expiresOn);           // In server timezone (IST)
+//       console.log('Locker expiresOn (UTC):', locker.expiresOn.toISOString()); // Always in UTC
+//     });
+
 //     const result = await Locker.updateMany(
-//           { expiresOn: { $lte: new Date() }, LockerStatus: { $ne: "expired" } },
-//           { LockerStatus: "expired" }
-//       );
+//       { expiresOn: { $lte: nowInUTC }, LockerStatus: { $ne: "expired" } },
+//       { LockerStatus: "expired" }
+//     );
 
+//     console.log('Lockers updated:', result.modifiedCount || 0);
 
-//       console.log(result);
-//       // console.log(`Expired lockers updated: ${result.nModified}`);
 //   } catch (err) {
-//       console.error(`Error updating expired lockers: ${err.message}`);
+//     console.error(`Error updating expired lockers: ${err.message}`);
 //   }
 // });
+
+cron.schedule('*/1 * * * *', async () => {
+  try {
+      const todayUTC = new Date();
+      todayUTC.setHours(0, 0, 0, 0); // Start of UTC day
+
+      const nowUTC = new Date();
+      nowUTC.setHours(nowUTC.getHours(), nowUTC.getMinutes(), nowUTC.getSeconds(), nowUTC.getMilliseconds()); // Current UTC time
+      //console.log('Now in UTC:', nowUTC);
+      // Find lockers whose expiration date is between todayUTC and nowUTC, and have a status that is not already "expired"
+      const lockersToUpdate = await Locker.find({
+          expiresOn: { $gte: todayUTC, $lte: nowUTC },
+          LockerStatus: { $ne: "expired" }
+      });
+      
+      for (const locker of lockersToUpdate) {
+          locker.LockerStatus = "expired"; // Set status to "expired"
+          await locker.save(); // Save the updated locker
+          console.log(`Time : ${Date()} and Locker ${locker.LockerNumber} status set to "expired".`);
+      }
+      
+  } catch (err) {
+      console.log(`Error in updating locker statuses: ${err.message}`);
+  }
+});
+
+
+cron.schedule('*/5 * * * *', async () => {
+    try {
+      const todayUTC = new Date();
+      todayUTC.setHours(0, 0, 0, 0); // Start of UTC day
+
+      const endOfTodayUTC = new Date(todayUTC);
+      endOfTodayUTC.setHours(23, 59, 59, 999); // End of UTC day
+
+      const data = await Locker.find({
+          expiresOn: { $gte: todayUTC, $lte: endOfTodayUTC },
+          emailSent: { $ne: true },
+      });
+
+      for (const locker of data) {
+          const email = locker.employeeEmail; 
+          const name = locker.employeeName;
+          const lockerNumber = locker.LockerNumber
+          const startDate = locker.StartDate;
+          const endDate = locker.EndDate;
+          const duration = locker.Duration
+          const currentDate = new Date()
+          const formatted = formatdate(currentDate)
+          const htmlBody = `
+              <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; line-height: 1.6;">
+    
+              <div style="text-align: center; margin-bottom: 20px;">
+                  <img 
+                  src="https://i.postimg.cc/N0HLHWXH/company-Logo.png" 
+                  alt="Company Logo" 
+                  style="width: 500px; height: auto;" 
+                  />
+              </div>
+
+              
+              <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                  Dear ${name},
+              </p>
+              <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                  We want to notify you that the locker assigned to you is expiring <b>Today</b>(${formatted}). Below are the details of the locker:
+              </p>
+
+              
+              <p style="font-size: 16px; color: #333; font-weight: bold; margin: 0 0 10px 0;">
+                  Locker Details:
+              </p>
+              <ul style="font-size: 16px; padding-left: 20px; margin: 0 0 15px 0; color: #333;">
+                  <li><strong>Locker Number:</strong> ${lockerNumber}</li>
+                  <li><strong>Original Validity Period:</strong> ${duration === "customize" ? `${formatdate(startDate)} to ${formatdate(endDate)}` : `${duration} Months`}</li>
+              </ul>
+
+              
+              <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                  If you require a locker in the future, please submit a new request through the Locker Management System or contact us at <strong>[Support Email/Phone]</strong>.
+              </p>
+              <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+                  We appreciate your cooperation and thank you for using our locker management service.
+              </p>
+              <p style="font-size: 16px; color: #333; margin: 0;">
+                  Best regards,<br />
+                  <strong>DraconX Pvt. Ltd</strong>,<br/>  
+                  <strong>"From Vision to Validation, faster"</strong>
+              </p>
+          </div>
+          `;
+          if (email) {
+              try {
+                  await mailSender(email, "Locker Expiration Notification", htmlBody);
+                  // Mark email as sent for this locker
+                  locker.emailSent = true;
+                  await locker.save();
+              } catch (emailError) {
+                  console.error(`Error sending email to ${email}: ${emailError.message}`);
+              }
+          } else {
+              console.warn(`No email found for locker ${locker._id}`);
+          }
+      }
+  } catch (err) {
+      console.log(`Error in fetching lockers expiring today: ${err.message}`);
+      next(err);
+  }
+});
 
 
 const COLUMN_MAPPING = {
