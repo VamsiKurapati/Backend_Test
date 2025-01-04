@@ -27,12 +27,14 @@ exports.signup = async (req, res, next) => {
         
         const { password: pass, ...rest } = userWithToken;
         
-        const options = {
-            expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-            httpOnly: true,
-        };
+        res.cookie('token', token, {
+        httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
+        secure: false,  // Ensure cookie is only sent over HTTPS in production
+        maxAge: 3600000,              // Token expires in 1 hour
+        sameSite: 'Strict',           // Prevent CSRF attacks
+       });
         
-        res.cookie("token", token, options).status(200).json(rest);
+        res.status(200).json({ message: 'Logged in successfully' });
     } catch (err) {
         console.log(`error in signup ${err.message}`);
         next(err);
