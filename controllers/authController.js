@@ -24,7 +24,7 @@ exports.signup = async (req, res, next) => {
         
         res.cookie('token', token, {
         httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
-        secure: false,  // Ensure cookie is only sent over HTTPS in production
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 3600000,              // Token expires in 1 hour
         sameSite: 'Nonet',           // Prevent CSRF attacks
        });
@@ -65,7 +65,7 @@ exports.login = async (req, res, next) => {
 
         res.cookie('token', token, {
            httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
-           secure: false,
+           secure: process.env.NODE_ENV === 'production',
            maxAge: 3600000,              // Token expires in 1 hour
            sameSite: 'None',          // Prevent CSRF attacks
        });
