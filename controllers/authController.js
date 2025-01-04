@@ -24,7 +24,7 @@ exports.signup = async (req, res, next) => {
         httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7200000,              // Token expires in 1 hour
-        sameSite: 'Nonet',           // Prevent CSRF attacks
+        sameSite: 'None',           // Prevent CSRF attacks
        });
         
         res.status(200).json({ message: 'Logged in successfully' });
@@ -63,7 +63,7 @@ exports.login = async (req, res, next) => {
            httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
            secure: process.env.NODE_ENV === 'production',
            maxAge: 7200000,              // Token expires in 1 hour
-           sameSite: 'Strict',          // Prevent CSRF attacks
+           sameSite: 'None',          // Prevent CSRF attacks
        });
        
         res.status(200).json({ message: 'Logged in successfully' , token: token});
