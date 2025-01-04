@@ -34,10 +34,49 @@ exports.signup = async (req, res, next) => {
     }
 };
      
+// exports.login = async (req, res, next) => {
+//     try {
+//         const { email, password } = req.body;
+//        console.log(email,password);
+
+//         const validUser = await User.findOne({ email });
+
+//         if (!validUser) {
+//             return next(errorHandler(404, "User Not Found!"));
+//         }                             
+                             
+//         const hashedPassword = validUser.password;
+//         const validPassword = await bcrypt.compare(password, hashedPassword);
+//         if (!validPassword) {
+//             return next(errorHandler(401, "Wrong Credentials"));
+//         }                                     
+
+//         const payload = {
+//             email: validUser.email,
+//             id: validUser._id,
+//             role: validUser.role
+//         };
+
+//         const token = jwt.sign(payload, process.env.JWT_SECRET);
+
+//         res.cookie('token', token, {
+//            httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
+//            secure: process.env.NODE_ENV === 'production',
+//            maxAge: 7200000,              // Token expires in 1 hour
+//            sameSite: 'None',          // Prevent CSRF attacks
+//        });
+       
+//         res.status(200).json({ message: 'Logged in successfully' , token: token});
+
+//     } catch (err) {
+//         console.error(`Error in sign in: ${err.message}`);
+//         next(err);
+//     }
+// };
+
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-       console.log(email,password);
 
         const validUser = await User.findOne({ email });
 
@@ -57,16 +96,21 @@ exports.login = async (req, res, next) => {
             role: validUser.role
         };
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET);
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+            expiresIn: "2h",
+        });
 
-        res.cookie('token', token, {
-           httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
-           secure: process.env.NODE_ENV === 'production',
-           maxAge: 7200000,              // Token expires in 1 hour
-           sameSite: 'None',          // Prevent CSRF attacks
-       });
-       
-        res.status(200).json({ message: 'Logged in successfully' , token: token});
+        const userWithToken = { ...validUser.toObject(), token };
+
+        const { password: pass, ...rest } = userWithToken;
+                                                                                              
+        const options = {
+           httpOnly: true,
+           expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
+           secure: false,
+        };
+
+        res.cookie('token', token, options).status(200).json(rest);
 
     } catch (err) {
         console.error(`Error in sign in: ${err.message}`);
