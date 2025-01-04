@@ -18,14 +18,12 @@ exports.signup = async (req, res, next) => {
             id: user._id
         };
          
-        const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "2d",
-        });
+        const token = jwt.sign(payload, process.env.JWT_SECRET);
         
         res.cookie('token', token, {
         httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 3600000,              // Token expires in 1 hour
+        maxAge: 7200000,              // Token expires in 1 hour
         sameSite: 'Nonet',           // Prevent CSRF attacks
        });
         
@@ -59,15 +57,13 @@ exports.login = async (req, res, next) => {
             role: validUser.role
         };
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "1h",
-        });
+        const token = jwt.sign(payload, process.env.JWT_SECRET);
 
         res.cookie('token', token, {
            httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
            secure: process.env.NODE_ENV === 'production',
-           maxAge: 3600000,              // Token expires in 1 hour
-           sameSite: 'None',          // Prevent CSRF attacks
+           maxAge: 7200000,              // Token expires in 1 hour
+           sameSite: 'Strict',          // Prevent CSRF attacks
        });
        
         res.status(200).json({ message: 'Logged in successfully' });
