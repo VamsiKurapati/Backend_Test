@@ -65,19 +65,16 @@ exports.login = async (req, res, next) => {
         };
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "2d",
+            expiresIn: "1h",
         });
 
-        const userWithToken = { ...validUser.toObject(), token };
-
-        const { password: pass, ...rest } = userWithToken;
-                                                                                              
-        const options = {
-            expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
-            httpOnly: true
-        };
-
-        res.cookie("token", token, options).status(200).json(rest);
+        res.cookie('token', token, {
+           httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
+           maxAge: 3600000,              // Token expires in 1 hour
+           sameSite: 'Strict',           // Prevent CSRF attacks
+       });
+       
+        res.status(200).json({ message: 'Logged in successfully' });
 
     } catch (err) {
         console.error(`Error in sign in: ${err.message}`);
