@@ -20,15 +20,6 @@ const axios = require('axios'); // Import axios
 
 const verifyToken = require('./utils/verifyUser.js')
 
-async function startDB() {
-  try{
-    await dbConnect();
-  } catch (error) {
-    console.error(`Error Connecting To DB: ${error.message}`);
-  }
-}
-startDB();
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
@@ -38,16 +29,24 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'], // Add other headers if required
 }));
 
+async function startServer() {
+  try{
+    await dbConnect();
+    app.listen(process.env.PORT, () => {
+        console.log(`server is running on port ${process.env.PORT}`);
+    });
+  } catch (error) {
+    console.error(`Error Connecting To DB: ${error.message}`);
+  }
+}
+startServer();
+
 app.use('/api/user', userroute);
 app.use('/api/admin', adminRoute);
 app.use('/api/resetPassword', resetPasswordRoute);
 app.use('/api/locker', lockerRoute);
 app.use('/api/issue', issueRoute);
 app.use('/api/profile', profileRoute);
-
-app.listen(process.env.PORT, () => {
-  console.log(`server is running on port ${process.env.PORT}`);
-});
 
 app.get('/', (req, res) => {
   res.send('Welcome to the backend!');
