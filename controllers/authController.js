@@ -66,7 +66,7 @@ exports.login = async (req, res, next) => {
            sameSite: 'Strict',          // Prevent CSRF attacks
        });
        
-        res.status(200).json({ message: 'Logged in successfully' });
+        res.status(200).json({ message: 'Logged in successfully' , token: token});
 
     } catch (err) {
         console.error(`Error in sign in: ${err.message}`);
