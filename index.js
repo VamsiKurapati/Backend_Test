@@ -25,8 +25,8 @@ app.use(cookieParser());
 app.use(cors({
   origin: "*",
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add other methods as needed
-  allowedHeaders: ['Content-Type', 'Authorization'], // Add other headers if required
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 async function startServer() {
@@ -39,6 +39,7 @@ async function startServer() {
     console.error(`Error Connecting To DB: ${error.message}`);
   }
 }
+
 startServer();
 
 app.use('/api/user', userroute);
@@ -59,37 +60,6 @@ function formatdate(date){
   const day = String(d.getDate()).padStart(2, '0');
   return `${day}/${month}/${year}`;
 };
-
-// cron.schedule('*/1 * * * *', async () => {
-//   try {
-//     // Now the current UTC time
-//     const nowInUTC = new Date().toISOString() // Current time in UTC
-//     console.log('Now in UTC:', nowInUTC);
-
-//     // // Update lockers with expired status if they expire today in UTC
-//     // const result = await Locker.updateMany(
-//     //   { expiresOn: { $lte: nowInUTC }, LockerStatus: { $ne: "expired" } },
-//     //   { LockerStatus: "expired" }
-//     // );
-//     // console.log(result);
-
-//     const lockers = await Locker.find({ expiresOn: { $lte: nowInUTC } });
-//     lockers.forEach(locker => {
-//       console.log('Locker expiresOn (raw):', locker.expiresOn);           // In server timezone (IST)
-//       console.log('Locker expiresOn (UTC):', locker.expiresOn.toISOString()); // Always in UTC
-//     });
-
-//     const result = await Locker.updateMany(
-//       { expiresOn: { $lte: nowInUTC }, LockerStatus: { $ne: "expired" } },
-//       { LockerStatus: "expired" }
-//     );
-
-//     console.log('Lockers updated:', result.modifiedCount || 0);
-
-//   } catch (err) {
-//     console.error(`Error updating expired lockers: ${err.message}`);
-//   }
-// });
 
 cron.schedule('*/1 * * * *', async () => {
   try {
@@ -245,7 +215,12 @@ app.post('/upload-excel', upload.single('file'), async (req, res) => {
     });
 
     // Send data array directly in the request body to match addMultipleLocker
-    const response = await axios.post('http://localhost:3000/api/admin/addMultipleLocker', data);
+    const token = req.headers.authorization.split(' ')[1];
+    const response = await axios.post('http://localhost:3000/api/admin/addMultipleLocker', data,{
+      headers: {
+        Authorization: `Bearer ${token}`, // Include the token in the request
+      },
+    });
     if (response.status === 200) {
       res.status(200).json({ message: "File processed and lockers added successfully", data });
     } else {
