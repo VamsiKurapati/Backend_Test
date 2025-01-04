@@ -2,7 +2,8 @@ const { errorHandler } = require("./error.js");
 const jwt = require('jsonwebtoken');
 
 const verifyToken = async (req, res, next) => {
-    const token = req.headers.authorisation;
+    //const token = req.headers.authorisation;
+    const token = req.cookie.token;
     console.log("Token: ",token);
     if (!token) {
         return next(errorHandler(401, "Unauthorized: Token is empty or incorrect"));
