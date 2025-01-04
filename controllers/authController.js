@@ -21,10 +21,6 @@ exports.signup = async (req, res, next) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: "2d",
         });
-       
-        const userWithToken = { ...user.toObject(), token };
-        
-        const { password: pass, ...rest } = userWithToken;
         
         res.cookie('token', token, {
         httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
@@ -69,6 +65,7 @@ exports.login = async (req, res, next) => {
 
         res.cookie('token', token, {
            httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
+           secure: false,
            maxAge: 3600000,              // Token expires in 1 hour
            sameSite: 'None',          // Prevent CSRF attacks
        });
