@@ -18,36 +18,36 @@ const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 const axios = require('axios'); // Import axios
 
-const verifyToken=require('./utils/verifyUser.js')
-async function startServer() {
+const verifyToken = require('./utils/verifyUser.js')
+
+async function startDB() {
   try{
     await dbConnect();
-
-    app.use(express.json());
-    app.use(cookieParser());
-    app.use(cors({
-      origin: "http://localhost:5173",
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add other methods as needed
-      allowedHeaders: ['Content-Type', 'Authorization'], // Add other headers if required
-    }));
-
-    app.use('/api/user', userroute);
-    app.use('/api/admin', adminRoute);
-    app.use('/api/resetPassword', resetPasswordRoute);
-    app.use('/api/locker', lockerRoute);
-    app.use('/api/issue', issueRoute);
-    app.use('/api/profile', profileRoute);
-
-    app.listen(process.env.PORT, () => {
-      console.log(`server is running on port ${process.env.PORT}`);
-    });
   } catch (error) {
-    console.error(`Error starting server: ${error.message}`);
+    console.error(`Error Connecting To DB: ${error.message}`);
   }
 }
+startDB();
 
-startServer();
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add other methods as needed
+  allowedHeaders: ['Content-Type', 'Authorization'], // Add other headers if required
+}));
+
+app.use('/api/user', userroute);
+app.use('/api/admin', adminRoute);
+app.use('/api/resetPassword', resetPasswordRoute);
+app.use('/api/locker', lockerRoute);
+app.use('/api/issue', issueRoute);
+app.use('/api/profile', profileRoute);
+
+app.listen(process.env.PORT, () => {
+  console.log(`server is running on port ${process.env.PORT}`);
+});
 
 app.get('/', (req, res) => {
   res.send('Welcome to the backend!');
