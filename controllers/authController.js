@@ -38,10 +38,10 @@ exports.login = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'None',
-            maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+            maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day in milliseconds
         });
 
-        return res.status(200).json({ message: "Logged In Successfully", rest });
+        return res.status(200).json(rest);
     } catch (err) {
         return res.status(err.status || 500).json({ message : `Error in Log in: ${err.message}` });
     }
@@ -49,10 +49,14 @@ exports.login = async (req, res) => {
 
 exports.LogOut = async (req, res) => {
     try {
-        res.clearCookie('auth_token');
-        res.status(200).json('user has been logged out !');
+        const cookies = req.cookies;
+        if (!cookies.auth_token) {
+            return res.status(204);
+        }
+        res.clearCookie('auth_token',{ httpOnly: true, secure: true, sameSite: 'None' });
+        res.status(200).json('ser has been logged out !');
     }
     catch (err) {
        return res.status(err.status || 500).json({ message : `Error in Log out: ${err.message}` });
     }
-}
+};
