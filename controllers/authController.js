@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
             expiresIn: "1d",
         });
         
-        const rest = { createdAt, updatedAt, auth_token };          
+        const result = { createdAt, updatedAt, auth_token };          
                                                                                               
         res.cookie('auth_token', token, {
             httpOnly: true,
@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
         });
 
-        return res.status(200).json(rest);
+        return res.status(200).json({message : "Logged In Successfully", result});
     } catch (err) {
         return res.status(err.status || 500).json({ message : `Error in Log in: ${err.message}` });
     }
