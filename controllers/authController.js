@@ -29,17 +29,15 @@ exports.login = async (req, res) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: "1d",
         });
-
-        const userWithToken = { ...validUser.toObject(), token };
-
-        const { password: pass, ...rest } = userWithToken;
+        
+        const rest = { createdAt, updatedAt, auth_token };          
                                                                                               
         res.cookie('auth_token', token, {
             httpOnly: true,
             secure: true,
             sameSite: 'Strict',
             maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-          });
+        });
 
         return res.status(200).json(rest);
     } catch (err) {
