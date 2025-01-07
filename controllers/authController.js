@@ -40,18 +40,18 @@ exports.login = async (req, res) => {
            secure: false,
         };
 
-        res.cookie('token', token, options).status(200).json(rest);
+        return res.cookie('token', token, options).status(200).json(rest);
     } catch (err) {
-        res.status(err.status).json({ message : `Error in Log in: ${err.message}` });
+        return res.status(err.status).json({ message : `Error in Log in: ${err.message}` });
     }
 };
 
 exports.LogOut = async (req, res) => {
     try {
-        res.clearCookie('token');
-        res.status(200).json('user has been logged out !');
+        return res.clearCookie('token');
+        return res.status(200).json('user has been logged out !');
     }
     catch (err) {
-       res.status(err.status).json({ message : `Error in Log out: ${err.message}` });
+       return res.status(err.status).json({ message : `Error in Log out: ${err.message}` });
     }
 }

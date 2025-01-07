@@ -61,11 +61,11 @@ exports.getOtp = async (req, res) => {
 
         await mailSender(email, "Your OTP for Password Reset", htmlBody);
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "OTP sent successfully",
         });
     } catch (err) {
-        res.status(err.status).json({ message : `Error in sending OTP: ${err.message}`});
+        return res.status(err.status).json({ message : `Error in sending OTP: ${err.message}`});
     }
 };
 
@@ -89,11 +89,11 @@ exports.validateOTP = async (req, res) => {
 
         await OTP.deleteOne({ email });
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "OTP successfully verified",
         });
     } catch (err) {
-        res.status(err.status).json({ message : `Error in validating OTP: ${err.message}`});
+        return res.status(err.status).json({ message : `Error in validating OTP: ${err.message}`});
     }
 };
 
@@ -116,10 +116,10 @@ exports.resetPassword = async (req, res) => {
 
         await OTP.deleteOne({ email });
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Password reset successfully",
         });
     } catch (err) {
-        res.status(err.status).json({ message : `Error in resetting password: ${err.message}`});
+        return res.status(err.status).json({ message : `Error in resetting password: ${err.message}`});
     }
 };

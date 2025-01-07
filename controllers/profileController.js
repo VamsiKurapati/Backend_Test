@@ -15,7 +15,7 @@ exports.viewProfile = async (req, res) => {
             return res.status(400).json({ message: "User not found" });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Details fetched successfully",
             data: {
                 name: user.name,
@@ -24,7 +24,7 @@ exports.viewProfile = async (req, res) => {
             },
         });
     } catch (err) {
-        res.status(err.status).json({ message : `Error in Viewing Profile: ${err.message}`});
+        return res.status(err.status).json({ message : `Error in Viewing Profile: ${err.message}`});
     }
 };
 
@@ -57,6 +57,6 @@ exports.updateProfile = async (req, res, next) => {
             data: updatedUser,
         });
     } catch (err) {
-        res.status(err.status).json({ message : `Error in updating profile: ${err.message}`});
+        return res.status(err.status).json({ message : `Error in updating profile: ${err.message}`});
     }
 };

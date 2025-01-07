@@ -69,9 +69,9 @@ exports.addStaff = async (req, res) => {
             htmlBody
         );
 
-        res.status(201).json({message: 'Staff Added Sucessfully...' });
+        return res.status(201).json({message: 'Staff Added Sucessfully...' });
     } catch (err) {
-        res.status(err.status).json({ message: `Error in adding staff: ${err.message}` });
+        return res.status(err.status).json({ message: `Error in adding staff: ${err.message}` });
     }
 };
 
@@ -99,9 +99,9 @@ exports.editStaff = async (req, res) => {
                           
         await user.save();
         
-        res.status(200).json({message: 'User updated successfully',});
+        return res.status(200).json({message: 'User updated successfully',});
     } catch (err) {
-        res.status(err.status).json({ message: `Error in editing staff: ${err.message}`});
+        return res.status(err.status).json({ message: `Error in editing staff: ${err.message}`});
     }
 };
 
@@ -115,12 +115,12 @@ exports.viewStaffDetails = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             message: 'User Details fetched successfully',
             user: user
         }); 
     } catch (err) {
-        res.status(err.status).json({ message: `Error in fetching staff: ${err.message}` });
+        return res.status(err.status).json({ message: `Error in fetching staff: ${err.message}` });
     }
 };
 
@@ -128,12 +128,12 @@ exports.viewAllStaff = async (req, res) => {
     try {
         let users = await User.find({ role: "Staff" });
         
-        res.status(200).json({
+        return res.status(200).json({
             message: 'Users  fetched successfully',
             users: users.length ? users : []
         });
     } catch (err) {
-        res.status(err.status).json({ message: `Error in fetching all staff: ${err.message}`});
+        return res.status(err.status).json({ message: `Error in fetching all staff: ${err.message}`});
     }
 };
 
@@ -151,9 +151,9 @@ exports.removeStaff = async (req, res) => {
             return res.status(404).json({ message: "Staff not found" });
         }
         
-        res.status(200).json({ message: "Staff member removed successfully" });
+        return res.status(200).json({ message: "Staff member removed successfully" });
     } catch (err) {
-        res.status(err.status).json({ message: `Error in removing staff: ${err.message}` });
+        return res.status(err.status).json({ message: `Error in removing staff: ${err.message}` });
     }
 };
 
@@ -170,7 +170,7 @@ exports.addLocker = async (req, res) => {
             data: locker
         });
     } catch (err) {
-        res.status(err.status).json({ message: `Error in adding locker: ${err.message}`});
+        return res.status(err.status).json({ message: `Error in adding locker: ${err.message}`});
     }
 }
 
@@ -198,6 +198,6 @@ exports.addMultipleLocker = async (req, res) => {
             data: newLockers
         });
     } catch (err) {
-        res.status(err.status).json({ message: `Error in creating lockers: ${err.message}`});
+        return res.status(err.status).json({ message: `Error in creating lockers: ${err.message}`});
     }
 };
