@@ -41,7 +41,7 @@ exports.addStaff = async (req, res) => {
                 <ul style="font-size: 16px; padding-left: 20px; margin: 0 0 15px 0; color: #333;">
                     <li><strong>Email:</strong> ${email}</li>
                     <li><strong>Temporary Password:</strong> ${password}</li>
-                    <li><strong>Portal Link:</strong><a href="http://localhost:5173/login">http://localhost:5173/login</a></li>
+                    <li><strong>Portal Link:</strong><a href="https://frontend-test-kappa-sage.vercel.app/login">https://frontend-test-kappa-sage.vercel.app/login</a></li>
                 </ul>
 
                 

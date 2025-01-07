@@ -36,10 +36,10 @@ exports.login = async (req, res) => {
                                                                                               
         res.cookie('auth_token', token, {
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
+            secure: true,
+            sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-          });    
+          });
 
         return res.status(200).json(rest);
     } catch (err) {
@@ -49,7 +49,7 @@ exports.login = async (req, res) => {
 
 exports.LogOut = async (req, res) => {
     try {
-        res.clearCookie("token", { path: '/' });
+        res.clearCookie('auth_token');
         res.status(200).json('user has been logged out !');
     }
     catch (err) {

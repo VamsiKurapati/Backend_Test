@@ -23,7 +23,7 @@ const verifyToken = require('./utils/verifyUser.js')
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: "*",
+  origin: "https://frontend-test-kappa-sage.vercel.app/",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -215,7 +215,7 @@ app.post('/upload-excel', upload.single('file'), async (req, res) => {
 
     // Send data array directly in the request body to match addMultipleLocker
     const token = req.headers.authorization.split(' ')[1];
-    const response = await axios.post('http://localhost:3000/api/admin/addMultipleLocker', data,{
+    const response = await axios.post('https://frontend-test-kappa-sage.vercel.app/api/admin/addMultipleLocker', data,{
       headers: {
         Authorization: `Bearer ${token}`, // Include the token in the request
       },
