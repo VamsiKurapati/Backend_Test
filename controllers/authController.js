@@ -29,8 +29,10 @@ exports.login = async (req, res) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: "1d",
         });
-        
-        const result = { createdAt, updatedAt, auth_token };          
+
+        const userWithToken = { ...validUser.toObject(), token };
+
+        const { password: pass, email: Email, gender: Gender, phoneNumber: Phone, role: Role, ...rest } = userWithToken;
                                                                                               
         res.cookie('auth_token', token, {
             httpOnly: true,
@@ -39,7 +41,7 @@ exports.login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
         });
 
-        return res.status(200).json({message : "Logged In Successfully", result});
+        return res.status(200).json({ message: "Logged In Successfully", rest });
     } catch (err) {
         return res.status(err.status || 500).json({ message : `Error in Log in: ${err.message}` });
     }
