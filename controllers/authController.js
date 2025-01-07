@@ -48,8 +48,7 @@ exports.login = async (req, res) => {
 
 exports.LogOut = async (req, res) => {
     try {
-        return res.clearCookie('token');
-        return res.status(200).json('user has been logged out !');
+        return res.clearCookie('token').status(200).json('user has been logged out !');
     }
     catch (err) {
        return res.status(err.status).json({ message : `Error in Log out: ${err.message}` });
