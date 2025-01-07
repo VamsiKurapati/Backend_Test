@@ -34,24 +34,25 @@ exports.login = async (req, res) => {
 
         const { password: pass, ...rest } = userWithToken;
                                                                                               
-        const options = {
-           httpOnly: true,
-           expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-           secure: false,
-        };
+        res.cookie('auth_token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+          });    
 
-        return res.cookie('token', token, options).status(200).json(rest);
+        return res.status(200).json(rest);
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in Log in: ${err.message}` });
+        return res.status(err.status || 500).json({ message : `Error in Log in: ${err.message}` });
     }
 };
 
 exports.LogOut = async (req, res) => {
     try {
-        //res.clearCookie("token", { path: '/', domain: 'http://localhost:5173' });
+        res.clearCookie("token", { path: '/' });
         res.status(200).json('user has been logged out !');
     }
     catch (err) {
-       return res.status(err.status).json({ message : `Error in Log out: ${err.message}` });
+       return res.status(err.status || 500).json({ message : `Error in Log out: ${err.message}` });
     }
 }

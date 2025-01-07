@@ -65,7 +65,7 @@ exports.getOtp = async (req, res) => {
             message: "OTP sent successfully",
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in sending OTP: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in sending OTP: ${err.message}`});
     }
 };
 
@@ -93,7 +93,7 @@ exports.validateOTP = async (req, res) => {
             message: "OTP successfully verified",
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in validating OTP: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in validating OTP: ${err.message}`});
     }
 };
 
@@ -120,6 +120,6 @@ exports.resetPassword = async (req, res) => {
             message: "Password reset successfully",
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in resetting password: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in resetting password: ${err.message}`});
     }
 };

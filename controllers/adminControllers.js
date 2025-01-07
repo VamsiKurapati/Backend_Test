@@ -22,7 +22,7 @@ exports.addStaff = async (req, res) => {
                     <img 
                     src="${process.env.IMG_LINK}" 
                     alt="Company Logo" 
-                    style="width: err.statuspx; height: auto;" 
+                    style="width: err.status || 500px; height: auto;" 
                     />
                 </div>
 
@@ -71,7 +71,7 @@ exports.addStaff = async (req, res) => {
 
         return res.status(201).json({message: 'Staff Added Sucessfully...' });
     } catch (err) {
-        return res.status(err.status).json({ message: `Error in adding staff: ${err.message}` });
+        return res.status(err.status || 500).json({ message: `Error in adding staff: ${err.message}` });
     }
 };
 
@@ -101,7 +101,7 @@ exports.editStaff = async (req, res) => {
         
         return res.status(200).json({message: 'User updated successfully',});
     } catch (err) {
-        return res.status(err.status).json({ message: `Error in editing staff: ${err.message}`});
+        return res.status(err.status || 500).json({ message: `Error in editing staff: ${err.message}`});
     }
 };
 
@@ -120,7 +120,7 @@ exports.viewStaffDetails = async (req, res) => {
             user: user
         }); 
     } catch (err) {
-        return res.status(err.status).json({ message: `Error in fetching staff: ${err.message}` });
+        return res.status(err.status || 500).json({ message: `Error in fetching staff: ${err.message}` });
     }
 };
 
@@ -133,7 +133,7 @@ exports.viewAllStaff = async (req, res) => {
             users: users.length ? users : []
         });
     } catch (err) {
-        return res.status(err.status).json({ message: `Error in fetching all staff: ${err.message}`});
+        return res.status(err.status || 500).json({ message: `Error in fetching all staff: ${err.message}`});
     }
 };
 
@@ -153,7 +153,7 @@ exports.removeStaff = async (req, res) => {
         
         return res.status(200).json({ message: "Staff member removed successfully" });
     } catch (err) {
-        return res.status(err.status).json({ message: `Error in removing staff: ${err.message}` });
+        return res.status(err.status || 500).json({ message: `Error in removing staff: ${err.message}` });
     }
 };
 
@@ -170,7 +170,7 @@ exports.addLocker = async (req, res) => {
             data: locker
         });
     } catch (err) {
-        return res.status(err.status).json({ message: `Error in adding locker: ${err.message}`});
+        return res.status(err.status || 500).json({ message: `Error in adding locker: ${err.message}`});
     }
 }
 
@@ -198,6 +198,6 @@ exports.addMultipleLocker = async (req, res) => {
             data: newLockers
         });
     } catch (err) {
-        return res.status(err.status).json({ message: `Error in creating lockers: ${err.message}`});
+        return res.status(err.status || 500).json({ message: `Error in creating lockers: ${err.message}`});
     }
 };

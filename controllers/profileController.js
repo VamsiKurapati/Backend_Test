@@ -24,7 +24,7 @@ exports.viewProfile = async (req, res) => {
             },
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in Viewing Profile: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in Viewing Profile: ${err.message}`});
     }
 };
 
@@ -57,6 +57,6 @@ exports.updateProfile = async (req, res, next) => {
             data: updatedUser,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in updating profile: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in updating profile: ${err.message}`});
     }
 };

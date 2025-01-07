@@ -61,7 +61,7 @@ exports.raiseTechnicalIssue = async (req, res) => {
 
         return res.status(200).json({ message: "Technical issue raised  successfully", issue });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in raising Issue: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in raising Issue: ${err.message}`});
     }
 };
 
@@ -115,7 +115,7 @@ l
 
         return res.status(200).json({ message: "Locker issue raised  successfully", issue });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in raising Issue: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in raising Issue: ${err.message}`});
     }
 };
 
@@ -124,7 +124,7 @@ exports.getAllIssue = async (req, res) => {
         const data = await Issue.find();
         return res.status(200).json({ message: " issues fetched successfully", data });
     } catch (err) { 
-        return res.status(err.status).json({ message : `Error in fetching Issue: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Issue: ${err.message}`});
     }
 };
 
@@ -133,7 +133,7 @@ exports.getTechnicalIssue = async (req, res) => {
         const data = await Issue.find({"type":"technical"});
         return res.status(200).json({ message: " issues fetched successfully", data });
     } catch (err) { 
-        return res.status(err.status).json({ message : `Error in fetching Technical issues: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Technical issues: ${err.message}`});
     }
 };
 
@@ -142,7 +142,7 @@ exports.getLockerIssue = async (req, res) => {
         const data = await Issue.find({"type":"locker"});
         return res.status(200).json({ message: " issues fetched successfully", data });
     } catch (err) { 
-        return res.status(err.status).json({ message : `Error in fetching Locker issues: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Locker issues: ${err.message}`});
     }
 };
 
@@ -159,7 +159,7 @@ exports.updateComment = async (req, res) => {
         await issue.save();
         return res.status(200).json({ message: "Comment updated successfully", issue });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in updating comment: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in updating comment: ${err.message}`});
     }
 };
 
@@ -182,7 +182,7 @@ exports.updateIssue = async (req, res) => {
 
         return res.status(200).json({ message: "action initiated", issue });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in updating Issue: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in updating Issue: ${err.message}`});
     }
 };
 
@@ -203,7 +203,7 @@ exports.resolveIssue = async (req, res) => {
         await mailSender(issue.email, "Issue has been Resolved", htmlBody);
         return res.status(200).json({ message: "Issue resolved  successfully", issue });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in resolving Issue: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in resolving Issue: ${err.message}`});
     }
 };
 
@@ -213,6 +213,6 @@ exports.deleteIssue = async (req, res) => {
         const issue = await Issue.findByIdAndDelete(id);
         return res.status(200).json({ message: " issues deleted successfully", issue });
     } catch (err) { 
-        return res.status(err.status).json({ message : `Error in deleting Issue: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in deleting Issue: ${err.message}`});
     }
 };

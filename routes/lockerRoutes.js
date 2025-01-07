@@ -73,7 +73,7 @@ router.put('/updateMultipleLockerPrices',verifyToken, async (req, res) => {
         })
     } catch (error) {
         console.error('Error updating locker prices:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(error.status || 500).json({ error: 'Internal server error' });
     }
 });
 

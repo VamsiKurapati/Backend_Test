@@ -27,7 +27,7 @@ exports.getAvailableLocker = async (req, res) => {
             data: locker,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching Available Lockers: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Available Lockers: ${err.message}`});
     }
 };
 
@@ -150,7 +150,7 @@ exports.allocateLocker = async (req, res) => {
             data: locker,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in allocating Locker: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in allocating Locker: ${err.message}`});
     }
 };
 
@@ -253,7 +253,7 @@ exports.cancelLockerAllocation = async (req, res) => {
             data: locker,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in canceling locker: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in canceling locker: ${err.message}`});
     }
 };
 
@@ -364,7 +364,7 @@ exports.renewLocker = async (req, res) => {
             data: locker,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in Renewing Locker: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in Renewing Locker: ${err.message}`});
     }
 };
 
@@ -376,7 +376,7 @@ exports.getAllLockers = async (req, res) => {
             data,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching Lockers: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Lockers: ${err.message}`});
     }
 };
 
@@ -388,7 +388,7 @@ exports.getAllocatedLockers = async (req, res) => {
             data,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching Allocated Lockers: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Allocated Lockers: ${err.message}`});
     }
 };
 
@@ -400,7 +400,7 @@ exports.getAvailableLockers = async (req, res) => {
             data,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching Available Lockers: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Available Lockers: ${err.message}`});
     }
 };
 
@@ -412,7 +412,7 @@ exports.getExpiredLockers = async (req, res) => {
             data,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching Expired Lockers: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Expired Lockers: ${err.message}`});
     }
 };
 
@@ -429,7 +429,7 @@ exports.changeLockerPricing = async (req, res) => {
         await locker.save();
         return res.status(200).json({ message: "Locker pricing updated successfully", locker });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in updating prices: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in updating prices: ${err.message}`});
     }
 };
 
@@ -450,7 +450,7 @@ exports.getExpiringIn7daysLockers = async (req, res) => {
             data,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching expiring Lockers: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching expiring Lockers: ${err.message}`});
     }
 };
 
@@ -471,7 +471,7 @@ exports.getExpiringToday = async (req, res) => {
             data,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching expiring lockers: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching expiring lockers: ${err.message}`});
     }
 };
 
@@ -490,7 +490,7 @@ exports.findLockerByUserEmail = async (req, res) => {
         // Respond with the list of lockers
         return res.status(200).json({ message: "Lockers found successfully", lockers });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching locker: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching locker: ${err.message}`});
     }
 };
 
@@ -520,7 +520,7 @@ exports.updateLockerCode = async (req, res) => {
 
         return res.status(200).json({ message: "Locker code updated successfully", locker });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in Updating Locker Code: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in Updating Locker Code: ${err.message}`});
     }
 };
 
@@ -542,7 +542,7 @@ exports.chageLockerStatusToExpired = async (req, res) => {
             data: updatedLocker,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching Issue: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Issue: ${err.message}`});
     }
 };
 
@@ -568,7 +568,7 @@ exports.deleteLocker = async (req, res) => {
             data: deletedLocker,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in deleting Locker: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in deleting Locker: ${err.message}`});
     }
 };
 
@@ -586,6 +586,6 @@ exports.getLockersByTypeandGender = async (req, res) => {
             data: lockers,
         });
     } catch (err) {
-        return res.status(err.status).json({ message : `Error in fetching Locker: ${err.message}`});
+        return res.status(err.status || 500).json({ message : `Error in fetching Locker: ${err.message}`});
     }
 };

@@ -166,7 +166,6 @@ cron.schedule('*/5 * * * *', async () => {
       }
   } catch (err) {
       console.log(`Error in fetching lockers expiring today: ${err.message}`);
-      next(err);
   }
 });
 
@@ -227,6 +226,6 @@ app.post('/upload-excel', upload.single('file'), async (req, res) => {
       res.status(response.status).json({ message: "Failed to add lockers", details: response.data });
     }
   } catch (err) {
-    res.status(500).json({ message: `Error processing file: ${err.message}` });
+    res.status(err.status || 500).json({ message: `Error processing file: ${err.message}` });
   }
 });
