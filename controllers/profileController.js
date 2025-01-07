@@ -1,7 +1,7 @@
 const User = require("../models/userModel.js");
 const bcrypt = require("bcrypt");
 
-exports.viewProfile = async (req, res, next) => {
+exports.viewProfile = async (req, res) => {
     try {
         const { userId } = req.body;
 
@@ -12,10 +12,10 @@ exports.viewProfile = async (req, res, next) => {
         const user = await User.findById(userId, "name email password phoneNumber");
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(400).json({ message: "User not found" });
         }
 
-        return res.status(200).json({
+        res.status(200).json({
             message: "Details fetched successfully",
             data: {
                 name: user.name,
@@ -24,8 +24,7 @@ exports.viewProfile = async (req, res, next) => {
             },
         });
     } catch (err) {
-        console.error(`Error in resetPassword: ${err.message}`);
-        next(err);
+        res.status(err.status).json({ message : `Error in Viewing Profile: ${err.message}`});
     }
 };
 
@@ -50,7 +49,7 @@ exports.updateProfile = async (req, res, next) => {
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
 
         if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(400).json({ message: "User not found" });
         }
 
         return res.status(200).json({
@@ -58,7 +57,6 @@ exports.updateProfile = async (req, res, next) => {
             data: updatedUser,
         });
     } catch (err) {
-        console.error(`Error in updating Profile: ${err.message}`);
-        next(err);
+        res.status(err.status).json({ message : `Error in updating profile: ${err.message}`});
     }
 };

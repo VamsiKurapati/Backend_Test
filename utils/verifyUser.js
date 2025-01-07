@@ -10,8 +10,6 @@ const verifyToken = async (req, res, next) => {
         token = req.cookies.token;
     }
     
-    console.log("Token: ",token);
-    
     if (!token) {
         return next(errorHandler(401, "Unauthorized: Token is empty or incorrect"));
     }
@@ -22,6 +20,6 @@ const verifyToken = async (req, res, next) => {
         req.user = user;
         next();
     });
-}; 
+};
 
 module.exports = verifyToken;

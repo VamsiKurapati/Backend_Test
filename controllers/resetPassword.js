@@ -1,16 +1,16 @@
+require('dotenv').config();
+
 const mailSender = require("../utils/mailSender.js");
 const OTP = require("../models/OTP.js");
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel.js");
-require('dotenv').config();
+
 function generateOTP() {
     const otp = Math.floor(100000 + Math.random() * 900000);
     return otp.toString();
 }
 
-console.log(generateOTP());
-
-exports.getOtp = async (req, res, next) => {
+exports.getOtp = async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) {
@@ -19,11 +19,11 @@ exports.getOtp = async (req, res, next) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({ message: "User with this email does not exist" });
+            return res.status(400).json({ message: "User with this email does not exist" });
         }
 
         const otp = generateOTP();
-        console.log(otp);
+
         const newOTP = await OTP.create({ email, otp });
 
         const htmlBody = `
@@ -61,22 +61,22 @@ exports.getOtp = async (req, res, next) => {
 
         await mailSender(email, "Your OTP for Password Reset", htmlBody);
 
-        return res.status(200).json({
+        res.status(200).json({
             message: "OTP sent successfully",
-            // data: otp
         });
     } catch (err) {
-        console.error(`Error in Sending OTP: ${err.message}`);
-        next(err);
+        res.status(err.status).json({ message : `Error in sending OTP: ${err.message}`});
     }
 };
-exports.validateOTP = async (req, res, next) => {
+
+exports.validateOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
 
         if (!email || !otp) {
             return res.status(400).json({ message: "Email, OTP, and new password are required" });
         }
+
         const otpRecord = await OTP.findOne({ email });
 
         if (!otpRecord) {
@@ -89,15 +89,15 @@ exports.validateOTP = async (req, res, next) => {
 
         await OTP.deleteOne({ email });
 
-        return res.status(200).json({
+        res.status(200).json({
             message: "OTP successfully verified",
         });
     } catch (err) {
-        console.error(`Error in resetPassword: ${err.message}`);
-        next(err);
+        res.status(err.status).json({ message : `Error in validating OTP: ${err.message}`});
     }
 };
-exports.resetPassword = async (req, res, next) => {
+
+exports.resetPassword = async (req, res) => {
     try {
         const { email, newPassword } = req.body;
 
@@ -116,11 +116,10 @@ exports.resetPassword = async (req, res, next) => {
 
         await OTP.deleteOne({ email });
 
-        return res.status(200).json({
+        res.status(200).json({
             message: "Password reset successfully",
         });
     } catch (err) {
-        console.error(`Error in resetPassword: ${err.message}`);
-        next(err);
+        res.status(err.status).json({ message : `Error in resetting password: ${err.message}`});
     }
 };

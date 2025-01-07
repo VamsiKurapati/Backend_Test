@@ -8,6 +8,4 @@ router.post('/getOtp', getOtp);
 router.post('/validateOTP', validateOTP);
 router.post('/resetPassword', resetPassword);
 
-
-
 module.exports = router;

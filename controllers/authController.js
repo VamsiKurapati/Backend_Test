@@ -1,93 +1,23 @@
+require('dotenv').config();
+
 const User = require('../models/userModel.js')
 const bcrypt = require('bcrypt');
-require('dotenv').config();
-const { errorHandler } = require('../utils/error.js');
 const jwt = require('jsonwebtoken');
 
-exports.signup = async (req, res, next) => {
-   
-    try {
-        const { name, role, email, password, phoneNumber, gender } = req.body;
-        
-        const hashedPassword = await bcrypt.hash(password, 10);
-        
-        const user = await User.create({ name, role, email, phoneNumber, password: hashedPassword, gender });
-        
-        const payload = {
-            email: email,
-            id: user._id
-        };
-         
-        const token = jwt.sign(payload, process.env.JWT_SECRET);
-        
-        res.cookie('token', token, {
-        httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 7200000,              // Token expires in 1 hour
-        sameSite: 'None',           // Prevent CSRF attacks
-       });
-        
-        res.status(200).json({ message: 'Logged in successfully' });
-    } catch (err) {
-        console.log(`error in signup ${err.message}`);
-        next(err);
-    }
-};
-     
-// exports.login = async (req, res, next) => {
-//     try {
-//         const { email, password } = req.body;
-//        console.log(email,password);
-
-//         const validUser = await User.findOne({ email });
-
-//         if (!validUser) {
-//             return next(errorHandler(404, "User Not Found!"));
-//         }                             
-                             
-//         const hashedPassword = validUser.password;
-//         const validPassword = await bcrypt.compare(password, hashedPassword);
-//         if (!validPassword) {
-//             return next(errorHandler(401, "Wrong Credentials"));
-//         }                                     
-
-//         const payload = {
-//             email: validUser.email,
-//             id: validUser._id,
-//             role: validUser.role
-//         };
-
-//         const token = jwt.sign(payload, process.env.JWT_SECRET);
-
-//         res.cookie('token', token, {
-//            httpOnly: true,               // Prevent access via JavaScript (helps mitigate XSS)
-//            secure: process.env.NODE_ENV === 'production',
-//            maxAge: 7200000,              // Token expires in 1 hour
-//            sameSite: 'None',          // Prevent CSRF attacks
-//        });
-       
-//         res.status(200).json({ message: 'Logged in successfully' , token: token});
-
-//     } catch (err) {
-//         console.error(`Error in sign in: ${err.message}`);
-//         next(err);
-//     }
-// };
-
-exports.login = async (req, res, next) => {
+exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
         const validUser = await User.findOne({ email });
 
         if (!validUser) {
-            return next(errorHandler(404, "User Not Found!"));
+            return res.status(404).json({ message : "User Not Found!" });
         }                             
                              
         const hashedPassword = validUser.password;
         const validPassword = await bcrypt.compare(password, hashedPassword);
         if (!validPassword) {
-            return next(errorHandler(401, "Wrong Credentials"));
+            return res.status(404).json({ message : "Wrong Credentials!" });
         }                                     
 
         const payload = {
@@ -97,7 +27,7 @@ exports.login = async (req, res, next) => {
         };
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "2h",
+            expiresIn: "1d",
         });
 
         const userWithToken = { ...validUser.toObject(), token };
@@ -106,25 +36,22 @@ exports.login = async (req, res, next) => {
                                                                                               
         const options = {
            httpOnly: true,
-           expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
+           expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
            secure: false,
         };
 
         res.cookie('token', token, options).status(200).json(rest);
-
     } catch (err) {
-        console.error(`Error in sign in: ${err.message}`);
-        next(err);
+        res.status(err.status).json({ message : `Error in Log in: ${err.message}` });
     }
 };
 
-exports.LogOut = async (req, res, next) => {
+exports.LogOut = async (req, res) => {
     try {
         res.clearCookie('token');
         res.status(200).json('user has been logged out !');
     }
     catch (err) {
-        console.log("error in logout")
-        next(err);
+       res.status(err.status).json({ message : `Error in Log out: ${err.message}` });
     }
 }

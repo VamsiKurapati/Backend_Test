@@ -5,7 +5,7 @@ const { raiseTechnicalIssue, raiseLockerIssue, updateIssue,resolveIssue, deleteI
 const verifyToken=require('../utils/verifyUser.js')
 
 
-router.post('/raiseTechnicalIssue', raiseTechnicalIssue);
+router.post('/raiseTechnicalIssue', verifyToken, raiseTechnicalIssue);
 router.post('/raiseLockerIssue',verifyToken, raiseLockerIssue);
 router.put('/updateIssue',verifyToken, updateIssue);
 router.put('/resolveIssue',verifyToken, resolveIssue);
