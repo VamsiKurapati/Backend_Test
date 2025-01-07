@@ -37,7 +37,7 @@ exports.login = async (req, res) => {
         res.cookie('auth_token', token, {
             httpOnly: true,
             secure: true,
-            sameSite: 'Strict',
+            sameSite: 'None',
             maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
         });
 
