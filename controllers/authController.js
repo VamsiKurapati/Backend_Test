@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
 
         const { password: pass, email: Email, gender: Gender, phoneNumber: Phone, role: Role, ...rest } = userWithToken;
                                                                                               
-        res.cookie('auth_token', token,{sameSite: 'None'});
+        res.cookie('auth_token', token,{sameSite: 'None', secure: false, httpOnly: false});
         //     , {
         //     httpOnly: true,
         //     secure: true,
