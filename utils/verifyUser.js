@@ -2,6 +2,8 @@ const { errorHandler } = require("./error.js");
 const jwt = require('jsonwebtoken');
 
 const verifyToken = async (req, res, next) => {
+    console.log(req.cookies);
+    
     let token = req.cookies.auth_token;
     
     // if (req.headers.authorization) {

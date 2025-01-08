@@ -54,7 +54,7 @@ exports.LogOut = async (req, res) => {
             return res.status(204);
         }
         res.clearCookie('auth_token',{ httpOnly: true, secure: true, sameSite: 'None' });
-        res.status(200).json('ser has been logged out !');
+        res.status(200).json('User has been logged out !');
     }
     catch (err) {
        return res.status(err.status || 500).json({ message : `Error in Log out: ${err.message}` });
