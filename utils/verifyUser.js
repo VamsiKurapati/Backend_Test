@@ -2,7 +2,7 @@ const { errorHandler } = require("./error.js");
 const jwt = require('jsonwebtoken');
 
 const verifyToken = async (req, res, next) => {
-    console.log(req.cookies);
+    console.log("Cookie Data:", req.cookies);
     
     let token = req.cookies.auth_token;
     
