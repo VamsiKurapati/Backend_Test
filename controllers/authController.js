@@ -32,7 +32,7 @@ exports.login = async (req, res) => {
 
         const userWithToken = { ...validUser.toObject(), token };
 
-        const { password: pass, email: Email, gender: Gender, phoneNumber: Phone, role: Role, ...rest } = userWithToken;
+        const { password: pass, ...rest } = userWithToken;
                                                                                               
         res.cookie('auth_token', token, {
             httpOnly: true,
