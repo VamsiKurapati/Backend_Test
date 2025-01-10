@@ -34,11 +34,11 @@ exports.login = async (req, res) => {
 
         const { password: pass, ...rest } = userWithToken;
                                                                                               
-        res.cookie('auth_token', token, {
+        res.cookie('token', token, {
+            expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
             httpOnly: true,
-            secure: true,
+            secure: false,
             sameSite: 'None',
-            maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day in milliseconds
         });
 
         return res.status(200).json(rest);
@@ -49,11 +49,7 @@ exports.login = async (req, res) => {
 
 exports.LogOut = async (req, res) => {
     try {
-        const cookies = req.cookies;
-        if (!cookies.auth_token) {
-            return res.status(204);
-        }
-        res.clearCookie('auth_token');//,{ httpOnly: true, secure: true, sameSite: 'None' });
+        res.clearCookie('token');
         res.status(200).json('User has been logged out !');
     }
     catch (err) {
