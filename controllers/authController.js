@@ -3,11 +3,9 @@ require('dotenv').config();
 const User = require('../models/userModel.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { use } = require('../routes/authRoutes.js');
-
-const express = use('express');
+const express = require('express');
+const cookieParser = require('cookie-parser');
 const app = express();
-const cookieParser = use(cookieParser());
 
 app.use(cookieParser());
 
