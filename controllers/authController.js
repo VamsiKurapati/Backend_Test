@@ -3,11 +3,6 @@ require('dotenv').config();
 const User = require('../models/userModel.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const app = express();
-
-app.use(cookieParser());
 
 exports.login = async (req, res) => {
     try {
@@ -38,13 +33,6 @@ exports.login = async (req, res) => {
         const userWithToken = { ...validUser.toObject(), token };
 
         const { password: pass, ...rest } = userWithToken;
-                                                                                              
-        res.cookie('token', token, {
-            expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-        });
 
         return res.status(200).json(rest);
     } catch (err) {
@@ -54,7 +42,6 @@ exports.login = async (req, res) => {
 
 exports.LogOut = async (req, res) => {
     try {
-        res.clearCookie('token');
         res.status(200).json('User has been logged out !');
     }
     catch (err) {

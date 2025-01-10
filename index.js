@@ -68,8 +68,6 @@ cron.schedule('*/1 * * * *', async () => {
 
       const nowUTC = new Date();
       nowUTC.setHours(nowUTC.getHours(), nowUTC.getMinutes(), nowUTC.getSeconds(), nowUTC.getMilliseconds()); // Current UTC time
-      //console.log('Now in UTC:', nowUTC);
-      // Find lockers whose expiration date is between todayUTC and nowUTC, and have a status that is not already "expired"
       const lockersToUpdate = await Locker.find({
           expiresOn: { $gte: todayUTC, $lte: nowUTC },
           LockerStatus: { $ne: "expired" }
