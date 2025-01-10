@@ -23,7 +23,7 @@ const verifyToken = require('./utils/verifyUser.js')
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: "https://frontend-test-kappa-sage.vercel.app",
+  origin: ["https://frontend-test-kappa-sage.vercel.app", "http://lockerwise-app.lockerwise.com"] ,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
