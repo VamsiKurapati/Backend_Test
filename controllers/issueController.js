@@ -74,7 +74,7 @@ exports.raiseLockerIssue = async (req, res) => {
         if (!locker) {
             return res.status(400).json({ message: "Locker not found" });
         }
-l
+        
         if (locker.employeeEmail !== email) {
             return res.status(400).json({ message: "Email does not match the locker owner" });
         }
