@@ -52,9 +52,25 @@ exports.updateProfile = async (req, res, next) => {
             return res.status(400).json({ message: "User not found" });
         }
 
+        const token = jwt.sign(
+            {
+                email: updatedUser.email,
+                id: updatedUser._id,
+                role: updatedUser.role,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1d",
+            }
+        );
+
+        const userWithToken = { ...updatedUser.toObject(), token };
+
+        const { password: pass, ...rest } = userWithToken;
+
         return res.status(200).json({
             message: "Profile updated successfully",
-            data: updatedUser,
+            data: rest,
         });
     } catch (err) {
         return res.status(err.status || 500).json({ message : `Error in updating profile: ${err.message}`});
