@@ -13,7 +13,7 @@ const issueSchema = new mongoose.Schema(
         },
         type: {
             type: String,
-            enum: ['technical', 'locker'],
+            default : 'locker'
         },
         status: {
             type: String,
