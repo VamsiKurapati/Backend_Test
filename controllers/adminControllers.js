@@ -93,7 +93,7 @@ exports.editStaff = async (req, res) => {
         if (phoneNumber && phoneNumber.length!==0) user.phoneNumber = phoneNumber;
         if (gender && gender.length!==0) user.gender = gender;
                        
-        if (password && password.length!==0 && password !== "Set New Password") {
+        if (password && password.length!==0) {
             user.password = await bcrypt.hash(password, 10);
         }
                           
