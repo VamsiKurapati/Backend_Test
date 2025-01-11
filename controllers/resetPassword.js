@@ -48,9 +48,6 @@ exports.getOtp = async (req, res) => {
                 <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
                     If you did not request this password reset, please ignore this email or contact our support team immediately.
                 </p>
-                <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
-                    If this cancellation was not requested by you or if you have any concerns, please contact us immediately at <strong>[Support Email/Phone]</strong>.
-                </p>
                 <p style="font-size: 16px; color: #333; margin: 0;">
                     Best regards,<br />
                     <strong>DraconX Pvt. Ltd</strong>,<br/>  
