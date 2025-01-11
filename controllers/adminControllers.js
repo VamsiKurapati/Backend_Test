@@ -93,7 +93,7 @@ exports.editStaff = async (req, res) => {
         if (phoneNumber && phoneNumber.length!==0) user.phoneNumber = phoneNumber;
         if (gender && gender.length!==0) user.gender = gender;
                        
-        if (password && password.length!==0) {
+        if (password && password.length!==0 && password !== "Set New Password") {
             user.password = await bcrypt.hash(password, 10);
         }
                           
@@ -114,10 +114,10 @@ exports.viewStaffDetails = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
+        const { password, ...rest } = user._doc;
         return res.status(200).json({
             message: 'User Details fetched successfully',
-            user: user
+            user: rest
         }); 
     } catch (err) {
         return res.status(err.status || 500).json({ message: `Error in fetching staff: ${err.message}` });
